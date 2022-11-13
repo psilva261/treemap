@@ -125,7 +125,10 @@ func (t *TreeMap[Key, Value]) Clear() {
 
 // Get retrieves a value from a map for specified key and reports if it exists.
 // Complexity: O(log N).
-func (t *TreeMap[Key, Value]) Get(id Key) (Value, bool) {
+func (t *TreeMap[Key, Value]) Get(id Key) (v Value, ok bool) {
+	if t == nil {
+		return
+	}
 	node := t.findNode(id)
 	if node == nil {
 		node = t.endNode
@@ -200,7 +203,10 @@ func (t *TreeMap[Key, Value]) UpperBound(key Key) ForwardIterator[Key, Value] {
 // It starts at the first element and goes to the one-past-the-end position.
 // You can iterate a map at O(N) complexity.
 // Method complexity: O(1)
-func (t *TreeMap[Key, Value]) Iterator() ForwardIterator[Key, Value] {
+func (t *TreeMap[Key, Value]) Iterator() (it ForwardIterator[Key, Value]) {
+	if t == nil {
+		return
+	}
 	return ForwardIterator[Key, Value]{tree: t, node: t.beginNode}
 }
 
@@ -505,7 +511,12 @@ type ForwardIterator[Key, Value any] struct {
 
 // Valid reports if the iterator position is valid.
 // In other words it returns true if an iterator is not at the one-past-the-end position.
-func (i ForwardIterator[Key, Value]) Valid() bool { return i.node != i.tree.endNode }
+func (i ForwardIterator[Key, Value]) Valid() bool {
+	if i.tree == nil || i.node == nil {
+		return false
+	}
+	return i.node != i.tree.endNode
+}
 
 // Next moves an iterator to the next element.
 // It panics if it goes out of bounds.
